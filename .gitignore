@@ -1,0 +1,17 @@
+*.DS_Store
+
+.idea/
+*.pyc
+
+sync_*
+excludes*
+
+asterisk/settings.py
+
+activate/
+
+asterisk/lib/
+asterisk/include/
+asterisk/bin/
+
+static/*

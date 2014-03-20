@@ -1,0 +1,7 @@
+Django==1.5.5
+django-mongodb-engine==0.5.1
+djangotoolbox==1.6.2
+permission-backend-nonrel==0.2
+pymongo==2.6.3
+requests==2.2.1
+wsgiref==0.1.2
