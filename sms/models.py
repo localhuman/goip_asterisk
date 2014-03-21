@@ -51,6 +51,9 @@ class SMSIn(models.Model):
     uuid = models.CharField(max_length=64)
     date = models.DateTimeField(auto_now_add=True)
 
+    app_response_code = models.CharField(max_length=3)
+    app_response_text = models.CharField(max_length=256)
+
     def __unicode__(self):
         return "Inbound SMS %s " % self.text
 
@@ -63,6 +66,9 @@ class SMSOut(models.Model):
     origin = models.URLField()
     status=models.CharField(max_length=32,choices=[('RECEIVED','RECEIVED'),('QUEUED','QUEUED'),('SUCCESS','SUCCESS'),('FAILURE','FAILURE'),('INVALID_URI','INVALID_URI'),('INVALID_PROTOCOL','INVALID_PROTOCOL')], default='RECEIVED')
     failure_reason = models.CharField(max_length=1024, blank=True,null=True)
+
+    app_response_code = models.CharField(max_length=3)
+    app_response_text = models.CharField(max_length=256)
 
     @property
     def toAsteriskString(self):

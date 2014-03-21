@@ -24,8 +24,10 @@ def notify_sms_received(sms):
               'datatype':'json'
     }
 
+    result=None
+
     if dest_method=='POST':
-        requests.post(dest_url, data= json.dumps(params))
+        result=requests.post(dest_url, data= json.dumps(params))
     else:
         logger.debug('sms received trying get!')
         try:
@@ -35,6 +37,12 @@ def notify_sms_received(sms):
             logger.debug('sms recevied sent with response %s %s ' % (result.status_code, result.text))
         except Exception as e:
             logger.debug('error retreiving url %s ' % str(e))
+
+    if result:
+        sms.app_response_code=result.status_code
+        sms.app_response_text=result.text
+        sms.save()
+
 
 
 def notify_sms_sent_status(sms):
@@ -49,10 +57,16 @@ def notify_sms_sent_status(sms):
         'status':sms.status,
     }
 
+    result=None
+
     if method=='GET':
         encoded_params = urllib.urlencode(params)
         full_url = '%s?%s' % (dest_url,encoded_params)
-        requests.get(full_url)
+        result = requests.get(full_url)
     else:
-        requests.post(dest_url, data= json.dumps(params))
+        result=requests.post(dest_url, data= json.dumps(params))
 
+    if result:
+        sms.app_response_code=result.status_code
+        sms.app_response_text=result.text
+        sms.save()

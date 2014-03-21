@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     url(r'^$', home),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^sms/', include('sms.urls')),
+    url(r'^mock/', include('mockapp.urls')),
 )

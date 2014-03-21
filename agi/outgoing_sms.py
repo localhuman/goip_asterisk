@@ -3,34 +3,16 @@
 import sys,datetime
 import requests
 
+from agi import AGI
+
 def log(msg):
     open('/tmp/smsout.log','ab+').write("OUTGOING SMS: %s: %s\n"%(datetime.datetime.now(),msg))
 
-AGIENV={}
 
-log('attempting to process outgoing sms')
+def process_outgoing_sms(smspk,status,port=80):
 
-try:
-    env = ""
-    while(env != "\n"):
-
-        env = sys.stdin.readline()
-        envdata =  env.split(":")
-        if len(envdata)==2:
-            AGIENV[envdata[0].strip()]=envdata[1].strip()
-        else:
-            log('environmentdata %s  not 2 parts ' % envdata)
-
-    log(AGIENV)
-
-    #get outgoing sms id
-    smspk = AGIENV['agi_arg_1']
-
-    #get outgoing sms status
-    status = AGIENV['agi_arg_2']
-
-    url='http://127.0.0.1/sms/%s/update/?status=%s' % (smspk,status)
-
+    url='http://127.0.0.1:%s/sms/%s/update/?status=%s' % (port,smspk,status)
+    print 'url: %s ' % url
     log('url to connect to is %s' % url)
 
     req = requests.get(url)
@@ -39,7 +21,20 @@ try:
 
     log('result: %s ' % output)
 
-except Exception as e:
-    log('exception processing outgoing sms: %s ' % str(e))
+    if req.status_code==200:
+        return 0
+    return req.text
 
-sys.exit()
+if __name__=='__main__':
+
+    log('attempting to process outgoing sms')
+
+    agi = AGI()
+
+    smspk = agi.env['agi_arg_1']
+    status = agi.env['agi_arg_2']
+
+    res = process_outgoing_sms(smspk,status,80)
+
+    sys.exit(res)
+
