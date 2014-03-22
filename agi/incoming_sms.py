@@ -5,13 +5,14 @@ import uuid
 import urllib
 from agi import AGI
 import datetime
+import base64
 
 
 def log(msg):
     open('/tmp/incomingsms.log','ab+').write("INCOMING SMS: %s: %s\n"%(datetime.datetime.now(),msg))
 
 
-def process_message(app_pk, uri_encoded_sms, guid, user,host):
+def process_message(app_pk, message_body, guid, user,host):
 
     #setup django
     #append asterisk django project
@@ -41,15 +42,12 @@ def process_message(app_pk, uri_encoded_sms, guid, user,host):
 
     log("ok, setup django")
 
-    decoded_message = urllib.unquote(uri_encoded_sms)
-    parts = decoded_message.split("\n")
+    parts = message_body.split("\n")
     phone = parts[0].replace("+","")
     parts.pop(0)
     message = "\n".join(parts)
 
     log("RECEIVED MESSAGE %s from phone number %s " % (message,phone))
-
-
     log("user and host: %s %s " % (user,host))
 
     try:
@@ -74,17 +72,24 @@ def process_message(app_pk, uri_encoded_sms, guid, user,host):
 if __name__=='__main__':
 
     myagi = AGI()
-
-    uri_encoded_sms = myagi.env['agi_arg_1']
-    user = myagi.env['agi_arg_2']
-    host = myagi.env['agi_arg_3']
+    log('processing sms')
+    b64String=myagi.env['agi_arg_1']
+#    uri_encoded_sms = myagi.env['agi_arg_1']
+#    user = myagi.env['agi_arg_2']
+#    host = myagi.env['agi_arg_3']
+    user='mydem'
+    host='asterisk.remotehuman.org'
     app_pk='532a5c8a680020046c330797'
+
+    log('b64string: %s ' % b64String)
+
+    message_body=base64.decodestring(b64String)
 
     #create uuid for incoming message
     guid = uuid.uuid1()
 
-    log("a, m, u, h: %s %s %s %s " %(app_pk,uri_encoded_sms,user,host))
+    log("a, m, u, h: %s %s %s %s " %(app_pk,message_body,user,host))
 
-    res = process_message(app_pk,uri_encoded_sms,guid, user,host)
+    res = process_message(app_pk,message_body,guid, user,host)
     log('result of process message %s ' % res)
     sys.exit(res)
