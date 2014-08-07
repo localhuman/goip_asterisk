@@ -73,7 +73,7 @@ class SMSOut(models.Model):
     @property
     def toAsteriskString(self):
         sms='%s\n%s' % (self.toNumber,self.text)
-        encodedSMS = urllib.quote(sms,'')
+        encodedSMS = urllib.quote(sms.encode('utf-8'),'')
         return encodedSMS
 
     def __unicode__(self):
